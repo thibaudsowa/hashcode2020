@@ -10,38 +10,28 @@ fun main(args: Array<String>) {
     println("Hello HashCode 2020!")
 
     val fileInput = ArrayList<String>()
-    fileInput.add("inputs/a_example.txt")
-    fileInput.add("inputs/b_read_on.txt")
-    fileInput.add("inputs/c_incunabula.txt")
-    fileInput.add("inputs/d_tough_choices.txt")
-    fileInput.add("inputs/e_so_many_books.txt")
-    fileInput.add("inputs/f_libraries_of_the_world.txt")
+    fileInput.add("a_example.txt")
+    fileInput.add("b_read_on.txt")
+    fileInput.add("c_incunabula.txt")
+    fileInput.add("d_tough_choices.txt")
+    fileInput.add("e_so_many_books.txt")
+    fileInput.add("f_libraries_of_the_world.txt")
 
-    val fileOutput = ArrayList<String>()
-    fileOutput.add("outputs/a_example.txt")
-    fileOutput.add("outputs/b_read_on.txt")
-    fileOutput.add("outputs/c_incunabula.txt")
-    fileOutput.add("outputs/d_tough_choices.txt")
-    fileOutput.add("outputs/e_so_many_books.txt")
-    fileOutput.add("outputs/f_libraries_of_the_world.txt")
-
-
-    fileInput.forEachIndexed { index, it ->
-        println("$fileInput[index]");
+    fileInput.parallelStream().forEach { it ->
+        println("$it");
 
         var librairieResult = arrayListOf<Librairie>()
         var scores = arrayListOf<Int>()
 
         val lines = ArrayList<String>()
-        File(fileInput[index]).forEachLine { lines.add(it) }
+        File("inputs/" + it).forEachLine { lines.add(it) }
         val template = HashCodeTemplate(lines)
         val data = BookProblemData(template)
 
-        leCerveau(data)
-        librairieResult.addAll(data.librairies);
+        leCerveau(data, librairieResult)
         val librairie = data.librairies.get(0)
         val reponse = HashCodeReponse(Arrays.asList(librairieResult.size), serializeLibrairies(librairieResult))
-        reponse.toFile(fileOutput[index])
+        reponse.toFile("outputs/" + it)
 
 
     }
@@ -49,7 +39,7 @@ fun main(args: Array<String>) {
 
 }
 
-private fun leCerveau(data: BookProblemData) {
+private fun leCerveau(data: BookProblemData, resultLibrairies: MutableList<Librairie>) {
     var listBouquinScanned = mutableListOf<Int>();
     data.librairies.sortBy { librairie -> librairie.nbJourRegister }
     data.librairies.forEach { librairie: Librairie ->
@@ -57,6 +47,9 @@ private fun leCerveau(data: BookProblemData) {
         librairie.books.filter { idBooks -> !listBouquinScanned.contains(idBooks) }.forEach { idBooks: Int ->
             librairie.selectBook(idBooks)
             listBouquinScanned.add(idBooks)
+            if (librairie.selectedBook.isNotEmpty()) {
+                resultLibrairies.add(librairie)
+            }
         }
     }
 }
@@ -91,5 +84,5 @@ fun calculateNbBooksNotAlreadyRead(bookProblemData: BookProblemData, librairie: 
 }
 
 fun serializeLibrairies(librairies: List<Librairie>): List<List<String>> {
-    return librairies.map { librairie -> librairie.serialize() }.flatMap { list -> list }
+    return librairies.map { librairie -> librairie.serialize() }.filter { list -> !list.isEmpty() }.flatMap { list -> list }
 }
