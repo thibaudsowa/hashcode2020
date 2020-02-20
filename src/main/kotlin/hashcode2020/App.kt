@@ -11,7 +11,9 @@ fun main(args: Array<String>) {
     val lines = ArrayList<String>()
 
     File("inputs/file1.txt").forEachLine { lines.add(it) }
-
+    val template = HashCodeTemplate(lines);
+    val reponse = HashCodeReponse(ArrayList<Int>(), ArrayList<List<String>>())
+    reponse.toFile("Filename")
     File("outputs/file1.txt")
             .also { file -> file.parentFile.mkdirs() }
             .writeText(lines.joinToString(" ").toUpperCase())
