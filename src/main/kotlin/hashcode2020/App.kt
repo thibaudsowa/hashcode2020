@@ -22,3 +22,7 @@ fun main(args: Array<String>) {
     reponse.toFile("Filename")
 
 }
+
+fun serializeLibrairies(librairies: List<Librairie>): List<List<String>> {
+    return librairies.map { librairie -> librairie.serialize() }.flatMap { list -> list }
+}
