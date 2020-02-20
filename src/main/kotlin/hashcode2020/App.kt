@@ -5,22 +5,89 @@ package hashcode2020
 
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 
 fun main(args: Array<String>) {
     println("Hello HashCode 2020!")
 
-    val lines = ArrayList<String>()
+    val fileInput = ArrayList<String>()
+    fileInput.add("inputs/a_example.txt")
+    fileInput.add("inputs/b_read_on.txt")
+    fileInput.add("inputs/c_incunabula.txt")
+    fileInput.add("inputs/d_tough_choices.txt")
+    fileInput.add("inputs/e_so_many_books.txt")
+    fileInput.add("inputs/f_libraries_of_the_world.txt")
 
-    File("inputs/a_example.txt").forEachLine { lines.add(it) }
-    val template = HashCodeTemplate(lines);
-    val data = BookProblemData(template)
+    val fileOutput = ArrayList<String>()
+    fileOutput.add("outputs/a_example.txt")
+    fileOutput.add("outputs/b_read_on.txt")
+    fileOutput.add("outputs/c_incunabula.txt")
+    fileOutput.add("outputs/d_tough_choices.txt")
+    fileOutput.add("outputs/e_so_many_books.txt")
+    fileOutput.add("outputs/f_libraries_of_the_world.txt")
 
-    val librairie = data.librairies.get(0)
-    librairie.selectBook(0)
-    val reponse = HashCodeReponse(Arrays.asList(1), librairie.serialize())
-    reponse.toFile("Filename")
 
+    fileInput.forEachIndexed { index, it ->
+        println("$fileInput[index]");
+
+        var librairieResult = arrayListOf<Librairie>()
+        var scores = arrayListOf<Int>()
+
+        val lines = ArrayList<String>()
+        File(fileInput[index]).forEachLine { lines.add(it) }
+        val template = HashCodeTemplate(lines)
+        val data = BookProblemData(template)
+
+        leCerveau(data)
+        librairieResult.addAll(data.librairies);
+        val librairie = data.librairies.get(0)
+        val reponse = HashCodeReponse(Arrays.asList(librairieResult.size), serializeLibrairies(librairieResult))
+        reponse.toFile(fileOutput[index])
+
+
+    }
+    println("C'est fini!")
+
+}
+
+private fun leCerveau(data: BookProblemData) {
+    var listBouquinScanned = mutableListOf<Int>();
+    data.librairies.sortBy { librairie -> librairie.nbJourRegister }
+    data.librairies.forEach { librairie: Librairie ->
+        librairie.books.sortedBy { idbook: Int -> data.bookScores[idbook] }
+        librairie.books.filter { idBooks -> !listBouquinScanned.contains(idBooks) }.forEach { idBooks: Int ->
+            librairie.selectBook(idBooks)
+            listBouquinScanned.add(idBooks)
+        }
+    }
+}
+
+fun calculScore(bookProblemData: BookProblemData, librairie: Librairie): Int {
+    var somme = 0
+    for (i in 0 until librairie.nbBook) {
+        somme = librairie.books[i] * hasLivre(bookProblemData, librairie.books[i])
+
+    }
+    return somme / getTime(bookProblemData, librairie)
+}
+
+fun hasLivre(bookProblemData: BookProblemData, idLivre: Int): Int {
+    if (bookProblemData.livreScanned.contains(idLivre)) {
+        return 0
+    } else {
+        return 1
+    }
+}
+
+fun getTime(bookProblemData: BookProblemData, librairie: Librairie): Int {
+    return calculateNbBooksNotAlreadyRead(bookProblemData, librairie) * librairie.nbBookDay + librairie.nbJourRegister
+}
+
+fun calculateNbBooksNotAlreadyRead(bookProblemData: BookProblemData, librairie: Librairie): Int {
+    var somme = 0
+    for (i in 0 until librairie.nbBook) {
+        somme += hasLivre(bookProblemData, librairie.books[i])
+    }
+    return somme
 }
 
 fun serializeLibrairies(librairies: List<Librairie>): List<List<String>> {

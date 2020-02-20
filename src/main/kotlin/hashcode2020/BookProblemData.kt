@@ -6,6 +6,7 @@ class BookProblemData {
     var nbLib: Int? = null;
     var nbJour: Int? = null;
     var librairies: MutableList<Librairie> = mutableListOf<Librairie>()
+    var livreScanned = arrayListOf<Int>();
 
     constructor(template: HashCodeTemplate) {
         this.nbBook = template.header.get(0)

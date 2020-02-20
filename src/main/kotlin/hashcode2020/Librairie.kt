@@ -11,6 +11,7 @@ class Librairie {
     var id: Int = 0;
 
     constructor(line1: List<String>, id: Int) {
+        this.id = id;
         this.nbBook = line1.get(0).toInt();
         this.nbJourRegister = line1.get(1).toInt();
         this.nbBookDay = line1.get(2).toInt();
@@ -22,8 +23,10 @@ class Librairie {
 
     fun serialize(): List<List<String>> {
         val result = mutableListOf<List<String>>()
-        result.add(Arrays.asList(this.id.toString() + " " + this.selectedBook.size.toString()));
-        result.add(selectedBook.map { i -> i.toString() })
+        if (!selectedBook.isEmpty()) {
+            result.add(Arrays.asList(this.id.toString() + " " + (this.selectedBook.size).toString()));
+            result.add(selectedBook.map { i -> i.toString() })
+        }
         return result;
     }
 
