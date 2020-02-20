@@ -4,17 +4,21 @@
 package hashcode2020
 
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 fun main(args: Array<String>) {
     println("Hello HashCode 2020!")
 
     val lines = ArrayList<String>()
 
-    File("inputs/file1.txt").forEachLine { lines.add(it) }
+    File("inputs/a_example.txt").forEachLine { lines.add(it) }
     val template = HashCodeTemplate(lines);
-    val reponse = HashCodeReponse(ArrayList<Int>(), ArrayList<List<String>>())
+    val data = BookProblemData(template)
+
+    val librairie = data.librairies.get(0)
+    librairie.selectBook(0)
+    val reponse = HashCodeReponse(Arrays.asList(1), librairie.serialize())
     reponse.toFile("Filename")
-    File("outputs/file1.txt")
-            .also { file -> file.parentFile.mkdirs() }
-            .writeText(lines.joinToString(" ").toUpperCase())
+
 }

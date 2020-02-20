@@ -12,11 +12,17 @@ class HashCodeReponse {
     }
 
     fun toFile(name: String) {
-        val file = File(name);
+
+        val file = File("outputs/" + name)
+                .also { file -> file.parentFile.mkdirs() }
+
         file.createNewFile()
-        file.writeText(header.map { i -> i.toString() }.reduce { a, b -> a + " " + b })
-        body.forEach { line: List<String> ->
-            file.writeText(line.reduce { a, b -> a + " " + b })
+        file.printWriter().use { out ->
+            out.println(header.map { i -> i.toString() }.reduce { a, b -> a + " " + b })
+            body.forEach { line: List<String> ->
+                out.println(line.reduce { a, b -> a + " " + b })
+            }
         }
+
     }
 }
